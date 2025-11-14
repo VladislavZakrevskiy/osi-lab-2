@@ -29,7 +29,7 @@ double determinant_parallel(const Matrix* matrix, int max_threads);
 
 DeterminantResult determinant_benchmark(const Matrix* matrix, int max_threads);
 
-void print_benchmark_results(const DeterminantResult* result, int matrix_size);
+void print_benchmark_results(const DeterminantResult* result);
 
 void* calculate_cofactor_thread(void* arg);
 

@@ -313,7 +313,7 @@ DeterminantResult determinant_benchmark(const Matrix* matrix, int max_threads) {
     return result;
 }
 
-void print_benchmark_results(const DeterminantResult* result, int matrix_size) {
+void print_benchmark_results(const DeterminantResult* result) {
     if (!result) {
         return;
     }

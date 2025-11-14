@@ -33,7 +33,7 @@ void performance_test_with_matrix(const Matrix* matrix, int max_threads) {
     }
 
     DeterminantResult result = determinant_benchmark(matrix, max_threads);
-    print_benchmark_results(&result, matrix->size);
+    print_benchmark_results(&result);
 }
 
 void run_comprehensive_test() {
