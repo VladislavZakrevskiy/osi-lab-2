@@ -138,8 +138,6 @@ int main(int argc, char* argv[]) {
         return 0;
     }
 
-    determinant_init_threading(max_threads);
-
     Matrix* matrix = NULL;
 
     if (input_file) {
@@ -171,7 +169,6 @@ int main(int argc, char* argv[]) {
     }
 
     matrix_free(matrix);
-    determinant_cleanup_threading();
 
     return 0;
 }

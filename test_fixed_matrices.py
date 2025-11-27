@@ -9,7 +9,7 @@ import os
 
 def run_test_with_file(matrix_file, threads):
     try:
-        cmd = ["./c/determinant", "-f", matrix_file, "-t", str(threads)]
+        cmd = ["./determinant", "-f", matrix_file, "-t", str(threads)]
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
         
         if result.returncode != 0:
@@ -20,9 +20,14 @@ def run_test_with_file(matrix_file, threads):
         
         data = {}
         
-        det_match = re.search(r'Детерминант:\s*([-\d.]+)', output)
+        # Парсим детерминант (включая inf и -inf)
+        det_match = re.search(r'Детерминант:\s*([-+]?(?:\d+\.?\d*|inf))', output, re.IGNORECASE)
         if det_match:
-            data['determinant'] = float(det_match.group(1))
+            det_str = det_match.group(1)
+            if 'inf' in det_str.lower():
+                data['determinant'] = str(float('inf') if det_str[0] != '-' else float('-inf'))
+            else:
+                data['determinant'] = float(det_str)
             
         speedup_match = re.search(r'Ускорение:\s*([\d.]+)x', output)
         if speedup_match:
@@ -51,9 +56,9 @@ def main():
     print("=" * 60)
     
     test_matrices = {
-        "20x20": "files/test_matrix_20x20.txt",
-        "30x30": "files/test_matrix_30x30.txt", 
-        "35x35": "files/test_matrix_35x35.txt"
+        "2000x2000": "./files/sample_2000x2000.txt",
+        "3000x3000": "./files/sample_3000x3000.txt",
+        "4000x4000": "./files/sample_4000x4000.txt",
     }
     
     thread_counts = list(range(1, 11))
@@ -84,15 +89,16 @@ def main():
             
             if data:
                 size_data['threads'].append(threads)
-                size_data['speedup'].append(data['speedup'])
-                size_data['efficiency'].append(data['efficiency'])
+                size_data['speedup'].append(data.get('speedup', 0))
+                size_data['efficiency'].append(data.get('efficiency', 0))
                 size_data['sequential_times'].append(data.get('sequential_time', 0))
                 size_data['parallel_times'].append(data.get('parallel_time', 0))
                 
-                if size_data['determinant'] is None:
+                if size_data['determinant'] is None and 'determinant' in data:
                     size_data['determinant'] = data['determinant']
                 
-                print(f"Ускорение: {data['speedup']:5.2f}x, Эффективность: {data['efficiency']:5.1f}%")
+                print(f"Ускорение: {data.get('speedup', 0):5.2f}x, Эффективность: {data.get('efficiency', 0):5.1f}%")
+                print(f"Последовательное время: {data.get('sequential_time', 0):5.3f} сек ({(data.get('sequential_time', 0) * 1000):5.0f} мс), Параллельное время: {data.get('parallel_time', 0):5.3f} сек ({(data.get('parallel_time', 0) * 1000):5.0f} мс)")
             else:
                 print("❌")
         
@@ -134,7 +140,7 @@ def create_plots(results):
             
         color = colors[i % len(colors)]
         marker = markers[i % len(markers)]
-        label = f'Матрица {matrix_name} (det={data["determinant"]:.0f})'
+        label = f'Матрица {matrix_name}'
         
         threads = data['threads']
         speedup = data['speedup']

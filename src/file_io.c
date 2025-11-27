@@ -23,7 +23,7 @@ Matrix* matrix_read_from_file(const char* filename) {
         return NULL;
     }
 
-    if (size <= 0 || size > 50) {
+    if (size <= 0) {
         printf("Ошибка: некорректный размер матрицы %d (должен быть от 1 до 50)\n", size);
         fclose(file);
         return NULL;
@@ -92,7 +92,7 @@ int file_exists(const char* filename) {
 }
 
 int create_sample_matrix_file(const char* filename, int size, int min_val, int max_val) {
-    if (!filename || size <= 0 || size > 50 || min_val >= max_val) {
+    if (!filename || size <= 0 || min_val >= max_val) {
         return 0;
     }
     

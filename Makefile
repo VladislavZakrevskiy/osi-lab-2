@@ -4,7 +4,7 @@ LDFLAGS = -lm -lpthread
 
 TARGET = determinant
 MAIN_SOURCE = ./src/main.c
-MAIN_OBJECT = main.o
+MAIN_OBJECT = ./objects/main.o
 
 MATRIX_SOURCE = ./src/matrix.c
 MATRIX_OBJECT = ./objects/matrix.o
@@ -15,17 +15,14 @@ FILE_IO_OBJECT = ./objects/file_io.o
 
 OBJECTS = $(MAIN_OBJECT) $(MATRIX_OBJECT) $(DETERMINANT_OBJECT) $(FILE_IO_OBJECT)
 
-DEMO_TARGET = demo_threads
-DEMO_SOURCE = ./src/demo_threads.c
-DEMO_OBJECT = ./objects/demo_threads.o
-
-all: $(TARGET) $(DEMO_TARGET)
+all: $(TARGET)
 
 $(TARGET): $(OBJECTS)
 	$(CC) $(CFLAGS) -o $(TARGET) $(OBJECTS) $(LDFLAGS)
 
 $(MAIN_OBJECT): $(MAIN_SOURCE) ./src/matrix.h ./src/determinant.h ./src/file_io.h
-	$(CC) $(CFLAGS) -c $(MAIN_SOURCE)
+	mkdir -p objects
+	$(CC) $(CFLAGS) -c $(MAIN_SOURCE) -o $(MAIN_OBJECT)
 
 $(MATRIX_OBJECT): $(MATRIX_SOURCE) ./src/matrix.h
 	mkdir -p objects
@@ -39,15 +36,8 @@ $(FILE_IO_OBJECT): $(FILE_IO_SOURCE) ./src/file_io.h ./src/matrix.h
 	mkdir -p objects
 	$(CC) $(CFLAGS) -c $(FILE_IO_SOURCE) -o $(FILE_IO_OBJECT)
 
-$(DEMO_TARGET): $(DEMO_OBJECT)
-	$(CC) $(CFLAGS) -o $(DEMO_TARGET) $(DEMO_OBJECT) $(LDFLAGS)
-
-$(DEMO_OBJECT): $(DEMO_SOURCE)
-	mkdir -p objects
-	$(CC) $(CFLAGS) -c $(DEMO_SOURCE) -o $(DEMO_OBJECT)
-
 clean:
-	rm -f $(OBJECTS) $(TARGET) $(DEMO_OBJECT) $(DEMO_TARGET)
+	rm -f $(OBJECTS) $(TARGET)
 	rm -f ../files/*.txt benchmark_results_*.txt
 
 install: $(TARGET)
@@ -63,10 +53,9 @@ run-file: $(TARGET) sample_3x3.txt
 	./$(TARGET) -f ../files/sample_3x3.txt -t 4
 
 samples: $(TARGET)
-	./$(TARGET) --create-sample ../files/sample_3x3.txt 3
-	./$(TARGET) --create-sample ../files/sample_4x4.txt 4
-	./$(TARGET) --create-sample ../files/sample_5x5.txt 5
-	./$(TARGET) --create-sample ../files/sample_6x6.txt 6
+	./$(TARGET) --create-sample ./files/sample_2000x2000.txt 2000
+	./$(TARGET) --create-sample ./files/sample_3000x3000.txt 3000
+	./$(TARGET) --create-sample ./files/sample_4000x4000.txt 4000
 
 demo-files: $(TARGET) samples
 	@echo "=== Демонстрация работы с файлами ==="
@@ -89,12 +78,6 @@ demo: $(TARGET)
 	@echo ""
 	@echo "3. Случайная матрица 5x5 с диапазоном -5..5:"
 	./$(TARGET) -s 5 -t 2 -r -5 5
-
-threads_demo: $(DEMO_TARGET)
-	@echo "=== Демонстрация мониторинга потоков ==="
-	@echo "Запускается программа с долгоживущими потоками."
-	@echo "Откройте новый терминал и выполните команды мониторинга."
-	./$(DEMO_TARGET) -t 4 -d 15
 
 test: $(TARGET)
 	./$(TARGET) --test

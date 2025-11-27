@@ -23,25 +23,18 @@ typedef struct {
     int threads_used;
 } DeterminantResult;
 
+// Основные функции
 double determinant_sequential(const Matrix* matrix);
-
 double determinant_parallel(const Matrix* matrix, int max_threads);
+double determinant_parallel_optimized(const Matrix* matrix, int max_threads);
+double determinant_parallel_best(const Matrix* matrix, int max_threads);
+double determinant_parallel_simple(const Matrix* matrix, int max_threads);
+double determinant_parallel_ultimate(const Matrix* matrix, int max_threads);
+double determinant_parallel_demo(const Matrix* matrix, int max_threads);
+double determinant_parallel_block(const Matrix* matrix, int max_threads);
 
+// Бенчмарк
 DeterminantResult determinant_benchmark(const Matrix* matrix, int max_threads);
-
 void print_benchmark_results(const DeterminantResult* result);
 
-void* calculate_cofactor_thread(void* arg);
-
-double get_time_difference(struct timeval start, struct timeval end);
-
-void determinant_init_threading(int max_threads);
-
-void determinant_cleanup_threading(void);
-
-extern pthread_mutex_t global_mutex;
-extern pthread_cond_t thread_available;
-extern int global_active_threads;
-extern int global_max_threads;
-
-#endif 
+#endif
