@@ -6,13 +6,24 @@
 #include <sys/time.h>
 
 typedef struct {
-    const Matrix* matrix;
-    int row;
-    int col;
-    double* result;
-    int thread_id;
-    int max_threads;
+    double** matrix;
+    int size;
+    int pivot_row;
+    double pivot_value;
+    int start_row;
+    int end_row;
+    int* swap_count;
+    pthread_mutex_t* mutex;
 } ThreadData;
+
+typedef struct {
+    double** matrix;
+    int size;
+    int pivot_row;
+    int start_row;
+    int end_row;
+} RowEliminationData;
+
 
 typedef struct {
     double determinant;

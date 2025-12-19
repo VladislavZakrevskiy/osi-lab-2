@@ -2,53 +2,6 @@
 #include <time.h>
 #include <string.h>
 
-Matrix* matrix_create(int size) {
-    if (size <= 0) {
-        return NULL;
-    }
-
-    Matrix* matrix = (Matrix*)malloc(sizeof(Matrix));
-    if (!matrix) {
-        return NULL;
-    }
-
-    matrix->size = size;
-    matrix->data = (double**)malloc(size * sizeof(double*));
-    if (!matrix->data) {
-        free(matrix);
-        return NULL;
-    }
-
-    for (int i = 0; i < size; i++) {
-        matrix->data[i] = (double*)malloc(size * sizeof(double));
-        if (!matrix->data[i]) {
-            for (int j = 0; j < i; j++) {
-                free(matrix->data[j]);
-            }
-            free(matrix->data);
-            free(matrix);
-            return NULL;
-        }
-        memset(matrix->data[i], 0, size * sizeof(double));
-    }
-
-    return matrix;
-}
-
-void matrix_free(Matrix* matrix) {
-    if (!matrix) {
-        return;
-    }
-
-    if (matrix->data) {
-        for (int i = 0; i < matrix->size; i++) {
-            free(matrix->data[i]);
-        }
-        free(matrix->data);
-    }
-
-    free(matrix);
-}
 
 void matrix_fill_random(Matrix* matrix, int min_val, int max_val) {
     if (!matrix_is_valid(matrix) || min_val >= max_val) {
@@ -137,4 +90,69 @@ Matrix* matrix_copy(const Matrix* matrix) {
 
 int matrix_is_valid(const Matrix* matrix) {
     return matrix != NULL && matrix->data != NULL && matrix->size > 0;
+}
+
+Matrix* matrix_create(int size) {
+    Matrix* matrix = (Matrix*)malloc(sizeof(Matrix));
+    if (!matrix) return NULL;
+    
+    matrix->size = size;
+    matrix->data = (double**)malloc(size * sizeof(double*));
+    if (!matrix->data) {
+        free(matrix);
+        return NULL;
+    }
+    
+    for (int i = 0; i < size; i++) {
+        matrix->data[i] = (double*)calloc(size, sizeof(double));
+        if (!matrix->data[i]) {
+            for (int j = 0; j < i; j++) {
+                free(matrix->data[j]);
+            }
+            free(matrix->data);
+            free(matrix);
+            return NULL;
+        }
+    }
+    
+    return matrix;
+}
+
+void matrix_free(Matrix* matrix) {
+    if (!matrix) return;
+    if (matrix->data) {
+        for (int i = 0; i < matrix->size; i++) {
+            free(matrix->data[i]);
+        }
+        free(matrix->data);
+    }
+    free(matrix);
+}
+
+double** copy_matrix_data(const Matrix* matrix) {
+    int n = matrix->size;
+    double** copy = (double**)malloc(n * sizeof(double*));
+    if (!copy) return NULL;
+    
+    for (int i = 0; i < n; i++) {
+        copy[i] = (double*)malloc(n * sizeof(double));
+        if (!copy[i]) {
+            for (int j = 0; j < i; j++) {
+                free(copy[j]);
+            }
+            free(copy);
+            return NULL;
+        }
+        memcpy(copy[i], matrix->data[i], n * sizeof(double));
+    }
+    
+    return copy;
+}
+
+void free_matrix_data(double** data, int size) {
+    if (!data) return;
+    for (int i = 0; i < size; i++) {
+        free(data[i]);
+    }
+    free(data);
 }

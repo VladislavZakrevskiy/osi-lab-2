@@ -1,0 +1,24 @@
+1 пишет
+1 читающих
+
+int x = 0; 
+
+void writer() {
+  lock(mutex);
+  x++;
+  unlock(mutex);
+} 
+
+void reader() {
+  lock(mutex);
+  printf("%d", x);
+  unlock(mutex);
+}
+
+void main() {
+  create(writer);
+  create(reader);
+
+  join(writer);
+  join(reader);
+}

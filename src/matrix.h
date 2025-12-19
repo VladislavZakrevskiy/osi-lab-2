@@ -21,6 +21,9 @@ Matrix* matrix_create_submatrix(const Matrix* matrix, int exclude_row, int exclu
 
 Matrix* matrix_copy(const Matrix* matrix);
 
+double** copy_matrix_data(const Matrix* matrix);
+void free_matrix_data(double** data, int size);
+
 int matrix_is_valid(const Matrix* matrix);
 
 #endif 
